@@ -3,8 +3,7 @@ const express = require('express');
 const app = express();
 
 //Functions Module
-app.use('/Function', require('./Controller/function_controller'));
-//User Module
-// app.use('/User', require('./Controller/user_controller'));
+app.use('/function', require('./Controller/function_controller'));
+
 
 module.exports = app;

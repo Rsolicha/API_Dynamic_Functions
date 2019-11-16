@@ -10,6 +10,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
+/**
+ * @function config use for define the bodyparser in functions
+ */
 function config() {
 
     app.use(bodyParser.urlencoded({ extended: true }));
@@ -31,8 +34,14 @@ function config() {
 }
 config();
 
+/**
+ * Call the router endpoints
+ */
 app.use(require('./router'));
 
 app.use(express.static('client'));
 
+/**
+ * Associate express with firebase
+ */
 exports.app = functions.https.onRequest(app);

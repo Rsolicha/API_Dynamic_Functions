@@ -1,5 +1,9 @@
 const QUERY = require('../Utilities/query_call');
 
+/**
+ * @function createFunction create a new function in the database and create the id of the function
+ * @param {json} data all info of the function
+ */
 async function createFunction(data) {
     let assign = new Date();
     let date = `${assign.getDate()}${assign.getSeconds()}${assign.getMilliseconds()}${Math.floor(Math.random() * 100000)}`;
@@ -7,21 +11,38 @@ async function createFunction(data) {
     return response !== 2 ? true : false
 }
 
+/**
+ * @function updateFunction updates function with new data
+ * @param {json} data new info of the function
+ * @param {string} idFunction id function to change
+ */
 async function updateFunction(data, idFunction) {
     let response = await QUERY.QueryUpdate('functions', idFunction, data);
     return response !== 2 ? true : false
 }
 
+/**
+ * @function deleteFunction deletes a function in the database
+ * @param {string} idFunction id of the function to delete
+ */
 async function deleteFunction(idFunction) {
     let response = await QUERY.QueryDeleteDocument('functions', idFunction);
     return response !== 2 ? true : false
 }
 
+/**
+ * @function getFunctionsUser gets all functions of user in the database
+ * @param {string} userID the id of the user
+ */
 async function getFunctionsUser(userID) {
     let response = await QUERY.QueryRead('functions', 'user', '==', userID);
     return response;
 }
 
+/**
+ * @function getCodesFunction gets the code of the function and his dependencies
+ * @param {string} idFunction the if of the function
+ */
 async function getCodesFunction(idFunction) {
     let response = await QUERY.QueryGetDocument('functions', idFunction);
     if (response) {
@@ -35,6 +56,24 @@ async function getCodesFunction(idFunction) {
     return false
 }
 
+/**
+ * @function getFunctionInfo get all information of specific function
+ * @param {string} idFunction id of function
+ */
+async function getFunctionInfo(idFunction) {
+    let response = await QUERY.QueryGetDocument('functions', idFunction);
+    if (response) {
+        if (response.code) {
+            return response;
+        }
+    }
+    return false;
+}
+
+/**
+ * @function verifyFunctionsAssociated verifies if function has dependencies and call them for gets all codes
+ * @param {array} functions list of id functions
+ */
 async function verifyFunctionsAssociated(functions) {
     let stringResult = "";
     await Promise.all(functions.map(async(element) => {
@@ -44,6 +83,14 @@ async function verifyFunctionsAssociated(functions) {
     return stringResult;
 }
 
+/**
+ * @function getSearch search a function with specific params
+ * @param {string} username 
+ * @param {string} description 
+ * @param {string} code 
+ * @param {string} tag 
+ * @param {string} function_name 
+ */
 async function getSearch(username, description, code, tag, function_name) {
     var list = [];
     username ? list.push(await QUERY.QueryRead('functions', 'user', '>=', username)) : false;
@@ -54,6 +101,10 @@ async function getSearch(username, description, code, tag, function_name) {
     return await checkData(list);
 }
 
+/**
+ * @function checkData this function verify if the list has functions duplicated
+ * @param {array} list 
+ */
 async function checkData(list) {
     let result = list.filter((element, index, self) =>
         index === self.findIndex((aux) => (
@@ -70,5 +121,6 @@ module.exports = {
     deleteFunction,
     getFunctionsUser,
     getCodesFunction,
-    getSearch
+    getSearch,
+    getFunctionInfo
 }

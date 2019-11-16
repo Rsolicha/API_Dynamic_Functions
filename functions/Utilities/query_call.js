@@ -82,6 +82,11 @@ async function QueryRead(reference, field, expression, value) {
 
 }
 
+/**
+ * @function QueryGetDocument function that read specific document and return his data
+ * @param {string} reference direction to read the data
+ * @param {string} idDocument the id of the document
+ */
 async function QueryGetDocument(reference, idDocument) {
     var db = admin.firestore();
     let Ref = await db.collection(reference).doc(idDocument).get()
