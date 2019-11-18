@@ -142,6 +142,19 @@ async function checkData(list) {
         )
     }
 
+    await Promise.all(result.map(async(funct) => {
+        if (funct.data.functions !== null) {
+            let result = [];
+            await Promise.all(funct.data.functions.map(async(element) => {
+                let aux = await QUERY.QueryGetDocument('functions', element);
+                result.push({ "id": element, "name": aux.name });
+
+            }));
+            funct.data.functions = result;
+        }
+
+    }));
+
     return result;
 }
 
