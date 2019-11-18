@@ -102,10 +102,31 @@ async function QueryGetDocument(reference, idDocument) {
     return Ref;
 }
 
+/**
+ * @function QueryGetDocument function that read all collection
+ * @param {string} reference direction to read the data
+ */
+async function QueryCollection(reference) {
+    var db = admin.firestore();
+    let Ref = await db.collection(reference).get()
+        .then(snapshot => {
+            let list = [];
+            snapshot.forEach(doc => {
+                list.push({ "id": doc.id, "data": doc.data() });
+            });
+            return list;
+        })
+        .catch(err => {
+            return err;
+        });
+    return Ref;
+}
+
 module.exports = {
     QueryAdd,
     QueryUpdate,
     QueryDeleteDocument,
     QueryRead,
-    QueryGetDocument
+    QueryGetDocument,
+    QueryCollection
 }

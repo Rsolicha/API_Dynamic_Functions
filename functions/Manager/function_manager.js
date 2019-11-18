@@ -108,12 +108,14 @@ async function getFunctionInfo(idFunction) {
  * @param {string} function_name 
  */
 async function getSearch(username, description, code, tag, function_name) {
+    let flag = 0;
     var list = [];
-    username ? list.push(await QUERY.QueryRead('functions', 'user', '==', username)) : false;
-    description ? list.push(await QUERY.QueryRead('functions', 'description', '==', description)) : false;
-    code ? list.push(await QUERY.QueryRead('functions', 'code', '==', code)) : false;
-    tag ? list.push(await QUERY.QueryRead('functions', 'tag', '==', tag)) : false;
-    function_name ? list.push(await QUERY.QueryRead('functions', 'name', '==', function_name)) : false;
+    username ? list.push(await QUERY.QueryRead('functions', 'user', '==', username)) : flag++;
+    description ? list.push(await QUERY.QueryRead('functions', 'description', '==', description)) : flag++;
+    code ? list.push(await QUERY.QueryRead('functions', 'code', '==', code)) : flag++;
+    tag ? list.push(await QUERY.QueryRead('functions', 'tag', '==', tag)) : flag++;
+    function_name ? list.push(await QUERY.QueryRead('functions', 'name', '==', function_name)) : flag++;
+    flag === 5 ? list.push(await QUERY.QueryCollection('functions')) : flag = 6
     return await checkData(list);
 }
 
