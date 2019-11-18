@@ -111,9 +111,9 @@ async function getSearch(username, description, code, tag, function_name) {
     var list = [];
     username ? list.push(await QUERY.QueryRead('functions', 'user', '==', username)) : false;
     description ? list.push(await QUERY.QueryRead('functions', 'description', '==', description)) : false;
-    code ? list.push(await QUERY.QueryRead('functions', 'name', '==', code)) : false;
+    code ? list.push(await QUERY.QueryRead('functions', 'code', '==', code)) : false;
     tag ? list.push(await QUERY.QueryRead('functions', 'tag', '==', tag)) : false;
-    function_name ? list.push(await QUERY.QueryRead('functions', 'code', '==', function_name)) : false;
+    function_name ? list.push(await QUERY.QueryRead('functions', 'name', '==', function_name)) : false;
     return await checkData(list);
 }
 
