@@ -36,6 +36,20 @@ async function deleteFunction(idFunction) {
  */
 async function getFunctionsUser(userID) {
     let response = await QUERY.QueryRead('functions', 'user', '==', userID);
+    await Promise.all(response.map(async(funct) => {
+        if (funct.data.functions !== null) {
+            let result = [];
+            await Promise.all(funct.data.functions.map(async(element) => {
+                let aux = await QUERY.QueryGetDocument('functions', element);
+                result.push({ "id": element, "name": aux.name });
+
+            }));
+            funct.data.functions = result;
+        }
+
+    }));
+
+
     return response;
 }
 
@@ -56,6 +70,21 @@ async function getCodesFunction(idFunction) {
     return false
 }
 
+
+/**
+ * @function verifyFunctionsAssociated verifies if function has dependencies and call them for gets all codes
+ * @param {array} functions list of id functions
+ */
+async function verifyFunctionsAssociated(functions) {
+    let stringResult = "";
+    await Promise.all(functions.map(async(element) => {
+        stringResult = stringResult + await getCodesFunction(element);
+
+    }));
+    return stringResult;
+}
+
+
 /**
  * @function getFunctionInfo get all information of specific function
  * @param {string} idFunction id of function
@@ -71,19 +100,6 @@ async function getFunctionInfo(idFunction) {
 }
 
 /**
- * @function verifyFunctionsAssociated verifies if function has dependencies and call them for gets all codes
- * @param {array} functions list of id functions
- */
-async function verifyFunctionsAssociated(functions) {
-    let stringResult = "";
-    await Promise.all(functions.map(async(element) => {
-        stringResult = stringResult + await getCodesFunction(element);
-
-    }));
-    return stringResult;
-}
-
-/**
  * @function getSearch search a function with specific params
  * @param {string} username 
  * @param {string} description 
@@ -93,11 +109,11 @@ async function verifyFunctionsAssociated(functions) {
  */
 async function getSearch(username, description, code, tag, function_name) {
     var list = [];
-    username ? list.push(await QUERY.QueryRead('functions', 'user', '>=', username)) : false;
-    description ? list.push(await QUERY.QueryRead('functions', 'description', '>=', description)) : false;
-    code ? list.push(await QUERY.QueryRead('functions', 'name', '>=', code)) : false;
-    tag ? list.push(await QUERY.QueryRead('functions', 'tag', '>=', tag)) : false;
-    function_name ? list.push(await QUERY.QueryRead('functions', 'code', '>=', function_name)) : false;
+    username ? list.push(await QUERY.QueryRead('functions', 'user', '==', username)) : false;
+    description ? list.push(await QUERY.QueryRead('functions', 'description', '==', description)) : false;
+    code ? list.push(await QUERY.QueryRead('functions', 'name', '==', code)) : false;
+    tag ? list.push(await QUERY.QueryRead('functions', 'tag', '==', tag)) : false;
+    function_name ? list.push(await QUERY.QueryRead('functions', 'code', '==', function_name)) : false;
     return await checkData(list);
 }
 
@@ -106,11 +122,24 @@ async function getSearch(username, description, code, tag, function_name) {
  * @param {array} list 
  */
 async function checkData(list) {
-    let result = list.filter((element, index, self) =>
-        index === self.findIndex((aux) => (
-            aux.id === element.id
-        ))
-    )
+    let auxList = [];
+
+    await Promise.all(list.map(async(listsearch) => {
+        if (listsearch.length > 0) {
+            await listsearch.forEach(element => {
+                auxList.push(element);
+            });
+        }
+    }));
+    let result = [];
+    if (auxList.length > 0) {
+        result = auxList.filter((element, index, self) =>
+            index === self.findIndex((aux) => (
+                aux.id === element.id
+            ))
+        )
+    }
+
     return result;
 }
 

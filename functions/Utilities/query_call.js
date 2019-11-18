@@ -66,7 +66,7 @@ async function QueryRead(reference, field, expression, value) {
     let Ref = await db.collection(reference).where(field, expression, value).get()
         .then(snapshot => {
             if (snapshot.empty) {
-                return null;
+                return [];
             }
             let list = [];
             snapshot.forEach(doc => {
